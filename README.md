@@ -49,7 +49,7 @@ POST `products`
 
 `401`, if bearer token is not valid
 
-`403`, if bearer token owner has admin role
+`403`, if bearer token owner does not have admin role
 ## Save products
 ### Requirements
 `Bearer token`,
