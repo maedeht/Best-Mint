@@ -1,0 +1,77 @@
+version: '2.0'
+services:
+
+  #PHP Services
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    links:
+      - redis
+    image: digitalocean.com/php
+    container_name: app
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - ./src:/var/www
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - app-network
+
+  #Nginx Services
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "82:80"
+      - "443:443"
+    volumes:
+      - ./src:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+  #MySQL Services
+  db:
+    image: mysql:5.7.22
+    container_name: db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8889:3306"
+    environment:
+      MYSQL_DATABASE: bestmint
+      MYSQL_ROOT_PASSWORD: 123456
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql/
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - app-network
+  redis:
+      image: redis:alpine
+      container_name: redis
+      ports:
+        - "6381:6379"
+      networks:
+        - app-network
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+#Volumes
+volumes:
+  dbdata:
+    driver: local
