@@ -48,6 +48,8 @@ POST `products`
 `422`, if required parameters have not been sent
 
 `401`, if bearer token is not valid
+
+`403`, if bearer token owner has admin role
 ## Save products
 ### Requirements
 `Bearer token`,
@@ -64,5 +66,3 @@ POST `products`
 `422`, if required parameters have not been sent
 
 `401`, if bearer token is not valid
-
-`403`, if bearer token owner has admin role
